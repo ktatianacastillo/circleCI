@@ -1,12 +1,23 @@
 version: 2.1
 jobs:
+  build-modules:
+       - image: circleci/node:10.16.3    
+    working_directory: ~/node_modules
+    steps:
+      - checkout
+      - run: npm install
+      - persist_to_workspace:
+            root: .
+            paths:
+                - node_modules
   unit-test:
     docker: 
       - image: circleci/node:10.16.3    
     working_directory: ~/files
     steps:
       - checkout
-      - run: npm install
+      - attach_workspace:
+            at: files
       - run: npm test
   build-and-push:
     executor: docker/docker
@@ -45,8 +56,14 @@ workflows:
   version: 2
   test:
     jobs:
-      - unit-test
+      - build-modules
+      - unit-test:
+          requires:
+            - build-modules
       - build-and-push:
+          filters:
+            branches:
+              only: master
           requires:
             - unit-test
       - deploy:          
