@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: files
+          at: .
       - run: npm test
   build-and-push:
     executor: docker/docker
