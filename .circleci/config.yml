@@ -1,32 +1,7 @@
-defaults: &defaults
-    docker:
-        - image: .
-version: 2
+version: 2.1
+orbs:
+  node: circleci/node@3.0.0
+workflows:
+  node-tests:
     jobs:
-        build:
-          <<: *defaults
-          steps:
-            - checkout
-            - run: npm install
-            - run: npm run build
-            - persist_to_workspace:
-                root: .
-                paths:
-                  - build/*
-        deploy:
-            <<: *defaults
-            steps:
-                - checkout
-                - attach_workspace:
-                    at: build
-                - run: aws configure set default.region eu-west-2
-                - run: aws s3 sync build $S3_BUCKET --acl public-read --delete
-
-    workflows:
-        version: 2
-        release_branches:
-            jobs:
-            - build
-            - deploy:
-                requires:
-                    - build
+      - node/test
