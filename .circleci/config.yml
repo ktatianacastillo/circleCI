@@ -1,51 +1,54 @@
-varsion: 2.1
+version: 2.1
 jobs:
-    unit-test:
-        docker: 
-            - image: circleci/node:10.16.3    
-        working_directory: ~/files
-        steps:
-            - checkout
-            - run: npm install
-            - run: npm test
-
-    build-and-push:
-        executor: docker
-        steps:
-            - setup_remote_docker
-            - checkout
-            - docker/check
-            - docker/build:
-                image: kimberlytcastillo/git-circleci
-                tag: "latest,$CIRCLE_SHA1"
-            - docker/push:
-                digest-path: /tmp/digest.txt
-                image: kimberlytcastillo/git-circleci
-                tag: "latest,$CIRCLE_SHA1"
-    deploy:
-        docker:
-            - image: circleci/python:3.7
-        steps:
-            - checkout
-            - run:
-                name: Install dependencies
-                command: |
-                    pip install ecs-deploy
-            - run:
-                name: Deploy
-                command: |
-                    ecs deploy $ECS_CLUSTER_NAME $ECS_SERVICE --image website-service kimberlytcastillo/git-circleci:$CIRCLE_SHA1 --timeout 1200 --ignore-warnings --region $AWS_REGION
+  unit-test:
+    docker: 
+      - image: circleci/node:10.16.3    
+    working_directory: ~/files
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm test
+  build-and-push:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: kimberlytcastillo/git-circleci
+          tag: "latest,$CIRCLE_SHA1"
+      - docker/push:
+          digest-path: /tmp/digest.txt
+          image: kimberlytcastillo/git-circleci
+          tag: "latest,$CIRCLE_SHA1"
+      - run:
+          command: |
+            echo "Digest is: $(</tmp/digest.txt)"
+            echo "testing!!!"
+  deploy:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            pip install ecs-deploy
+      - run:
+          name: Deploy
+          command: |
+            ecs deploy $ECS_CLUSTER_NAME $ECS_SERVICE --image website-service kimberlytcastillo/git-circleci:$CIRCLE_SHA1 --timeout 1200 --ignore-warnings --region $AWS_REGION
 orbs:
-    docker: circleci/docker@1.4.0
+  docker: circleci/docker@1.4.0
 
 workflows:
-    version: 2
-    test:
-        jobs:
-            - unit-test
-            - build-and-push:
-                requires:
-                    - unit-test
-            - deploy:
-                requires:
-                    - build-and-push
+  version: 2
+  test:
+    jobs:
+      - unit-test
+      - build-and-push:
+          requires:
+            - uni-test
+      - deploy:          
+          requires:
+            - build-and-push
