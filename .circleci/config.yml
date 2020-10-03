@@ -48,7 +48,7 @@ workflows:
       - unit-test
       - build-and-push:
           requires:
-            - uni-test
+            - unit-test
       - deploy:          
           requires:
             - build-and-push
