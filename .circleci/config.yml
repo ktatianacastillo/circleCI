@@ -59,6 +59,8 @@ workflows:
                 requires:
                     - build-modules
             - build-and-push
+                requires:
+                    - unit-test
             - deploy:
                 requires:
                     - build-and-push
