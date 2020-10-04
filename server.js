@@ -5,10 +5,10 @@ const PORT = 80;
 const HOST = '0.0.0.0';
 
 const app = express();
-app.get('/:number', (req, res) => {
-  const number = req.params.number;
+app.get('/:numero', (req, res) => {
+  const numero = req.params.numero;
   if (Number.isInteger(number * 2)) {
-    res.send(`Your number (${number}) is ${evenOrOdd(number) ? 'EVEN' : 'ODD'}`);
+    res.send(`Your number (${numero}) is ${evenOrOdd(numero) ? 'EVEN' : 'ODD'}`);
   } else {
     res.send("The param must be number type");
   }
