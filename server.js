@@ -8,7 +8,7 @@ const app = express();
 app.get('/:number', (req, res) => {
   const number = req.params.number;
   if (Number.isInteger(number * 2)) {
-    res.send(`Your number (${number}) is ${evenOrOdd(number) ? 'EVEN' : 'ODD'}`);
+    res.send(`Your number is ${evenOrOdd(number) ? 'EVEN' : 'ODD'}`);
   } else {
     res.send("The param must be number type");
   }
